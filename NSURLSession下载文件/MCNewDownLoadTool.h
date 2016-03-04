@@ -52,6 +52,17 @@ typedef NS_ENUM(NSInteger, MCDownLoadStatus) {
 
 -(instancetype)initWithUrl:(NSString*)urlString filePath:(NSString*)filePath;
 
+#pragma mark-post和get请求
+
+-(void)getDataTaskWithUrl:(NSString *)url completionHandler:(void (^)(NSString *dataString, NSURLResponse *response, NSError *error))completionHandler;
+
+- (void) postDataTaskWithUrl:(NSString*)url params:(NSString*)params completionHandler:(void (^)(NSString *dataString, NSURLResponse *response, NSError *error))completionHandler;
+
+
+
+
+
+#pragma mark-下载大文件的方法
 
 /**
  *  开始下载

@@ -10,17 +10,48 @@
 @interface MCNewDownLoadTool()
 
 {
+//------下载大文件的变量------//
     NSURLSessionDownloadTask * _task;
     NSData * _resumeData;
     NSURLSession * _session;
     NSURLRequest * _request;
+//------网络请求的变量------//
+    NSURLSessionDataTask*_dataTask;
 }
-
 @end;
 
 
 @implementation MCNewDownLoadTool
 
+//私有方法-data转string
+- (NSString*)dataToString:(NSData*)data{
+    NSString*str=[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
+    return str;
+    
+};
+
+- (void) getDataTaskWithUrl:(NSString *)url completionHandler:(void (^)(NSString *dataString, NSURLResponse *response, NSError *error))completionHandler{
+    _session=[NSURLSession sharedSession];
+    NSURLRequest*request=[NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+    _dataTask=[_session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (completionHandler) {
+            completionHandler([self dataToString:data],response,error);
+        }
+    }];
+    [_dataTask resume];
+}
+- (void) postDataTaskWithUrl:(NSString *)url params:(NSString *)params completionHandler:(void (^)(NSString *dataString, NSURLResponse *response, NSError *error))completionHandler{
+    _session=[NSURLSession sharedSession];
+    NSMutableURLRequest*request=[NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    request.HTTPMethod=@"POST";
+    request.HTTPBody=[params dataUsingEncoding:NSUTF8StringEncoding];
+    _dataTask=[_session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (completionHandler) {
+            completionHandler([self dataToString:data],response,error);
+        }
+    }];
+    [_dataTask resume];
+}
 -(instancetype)initWithUrl:(NSString *)urlString filePath:(NSString *)filePath{
     if (self=[super init]) {
         self.urlString=urlString;
@@ -60,7 +91,8 @@
     [_task resume];
     self.status=MCDownLoadStatusContinueDownLoad;
 }
-#pragma mark-代理
+
+#pragma mark-代理-下载大文件
 
 
 /**
@@ -110,7 +142,7 @@
  *  @param error   请求失败返回的错误信息
  */
 - (void) URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error{
-    
+
 }
 
 
